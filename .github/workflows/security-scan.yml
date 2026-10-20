@@ -31,3 +31,6 @@ jobs:
         continue-on-error: true
         run: |
           checkov -d samples/safe --framework terraform
+      - name: Scan risky Terraform sample
+        run: |
+          checkov -d samples/risky --framework terraform --soft-fail
