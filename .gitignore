@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/secrets.toml
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+reports/*
+!.gitkeep
+.env
