@@ -1,46 +1,38 @@
 # CloudLeak Guard
 
-A local-first prototype that scans Terraform source for selected security, governance, and policy-based cost-review signals before deployment.
+CloudLeak Guard is a Streamlit app for static security review of Terraform `.tf` files before deployment.
 
-## What it does
-- Checks for a text pattern suggesting SSH port 22 is open to `0.0.0.0/0`.
-- Flags S3 bucket resource blocks where encryption is not visibly configured in that block.
-- Checks selected AWS resources for `Environment` and `Owner` tags.
-- Flags selected large instance-type strings for human review (not a price estimate).
-- Optionally runs Checkov and combines its failed checks.
-- Exports JSON and HTML reports, and compares two JSON reports.
+## Features
+- Upload a ZIP containing Terraform files or scan a bundled sample.
+- Custom heuristic checks for public SSH ingress, S3 encryption review, required tags, and large EC2 instance types.
+- Optional Checkov findings when Checkov is installed.
+- Severity summary, searchable/filterable findings, JSON/HTML reports, and report comparison.
+- Automated compilation and unit tests through GitHub Actions.
 
-## Limitations
-This is an educational MVP, not a complete Terraform/HCL parser or security scanner. Custom checks use conservative text patterns and may miss cases or produce false positives. Verify results against the actual Terraform configuration and cloud provider behavior. No cloud resources are created and no credentials are needed. Cost findings are policy signals, not actual pricing calculations or guaranteed savings.
-
-## Windows quick start (VS Code terminal)
-Open this folder in VS Code. In PowerShell:
+## Run locally (PowerShell)
 ```powershell
-py -m venv .venv
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-streamlit run app.py
+python -m streamlit run app.py
 ```
-Open the local URL printed by Streamlit (normally `http://localhost:8501`).
 
-If PowerShell blocks activation, you can use Command Prompt:
-```cmd
-.venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
-streamlit run app.py
+If activation is blocked:
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
 ## Run tests
 ```powershell
+python -m py_compile app.py scanner.py report_generator.py
 python -m unittest discover -s tests -v
 ```
 
-## Git
-```powershell
-git init
-git add .
-git commit -m "Build CloudLeak Guard Terraform scanner"
-```
-Create a GitHub repository separately when you are ready to publish. Never commit credentials, Terraform state files, or secret values.
+## Limitations and safety
+Custom checks are lightweight heuristics, not a complete Terraform/HCL parser. Complex expressions, modules, and organization-specific policies may require manual review or a dedicated policy engine. Checkov results appear only when Checkov is installed and returns parseable output. A clean scan is not proof that a configuration is secure.
+
+Do not upload secrets, credentials, or private keys. This app performs static analysis and does not need to create AWS resources. Do not run `terraform apply` just to scan a configuration.
+
+## Deployment
+Push the repository to GitHub and deploy it through Streamlit Community Cloud with `app.py` as the entry point. Review deployment logs if installation or startup fails.
